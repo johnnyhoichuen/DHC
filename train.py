@@ -18,10 +18,12 @@ random.seed(0)
 def main(num_actors=configs.num_actors, log_interval=configs.log_interval):
     ray.init()
 
+    # init buffer, learner and actor
     buffer = GlobalBuffer.remote()
-    learner = Learner.remote(buffer)
+    learner = Learner.remote(buffer, 16000)
     time.sleep(1)
-    actors = [Actor.remote(i, 0.4**(1+(i/(num_actors-1))*7), learner, buffer) for i in range(num_actors)]
+    actors = [Actor.remote(worker_id=i, epsilon=0.4 ** (1 + (i / (num_actors - 1)) * 7), learner=learner, buffer=buffer)
+              for i in range(num_actors)]
 
     for actor in actors:
         actor.run.remote()
@@ -34,13 +36,14 @@ def main(num_actors=configs.num_actors, log_interval=configs.log_interval):
     print('start training')
     buffer.run.remote()
     learner.run.remote()
-    
+
     done = False
     while not done:
         time.sleep(log_interval)
         done = ray.get(learner.stats.remote(log_interval))
         ray.get(buffer.stats.remote(log_interval))
         print()
+
 
 if __name__ == '__main__':
     main()
