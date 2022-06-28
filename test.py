@@ -279,7 +279,7 @@ if __name__ == '__main__':
 
     # create_test(test_env_settings=configs.test_env_settings, num_test_cases=configs.num_test_cases)
     # test_model((2000, 6000))
-    # test_model(337500)
+    test_model(337500)
 
     # make_animation(model_name='2000', test_case_idx=0, steps=160)
     # make_animation(model_name='4000', test_case_idx=0, steps=160)
