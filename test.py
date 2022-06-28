@@ -64,7 +64,7 @@ def create_test(test_env_settings, num_test_cases):
 #         start = time.time()
 #         for i in range(test_num):
 #             env.load(tests[i][0], tests[i][1], tests[i][2])
-            
+
 #             done = False
 #             network.reset()
 
@@ -87,7 +87,7 @@ def create_test(test_env_settings, num_test_cases):
 
 #             if i == case and show:
 #                 env.close(True)
-        
+
 #         f_rate = (test_num-fail)/test_num
 #         mean_steps = sum(steps)/test_num
 #         duration = time.time()-start
@@ -102,7 +102,7 @@ def create_test(test_env_settings, num_test_cases):
 
 def test_model(model_range: Union[int, tuple]):
     '''
-    test model in 'models' file with model number 
+    test model in 'models' file with model number
     '''
     network = Network()
     network.eval()
@@ -175,7 +175,7 @@ def test_one_case(args):
     env = Environment()
     env.load(env_set[0], env_set[1], env_set[2])
     obs, pos = env.observe()
-    
+
     done = False
     network.reset()
 
@@ -187,7 +187,7 @@ def test_one_case(args):
 
     return np.array_equal(env.agents_pos, env.goals_pos), step
 
-def make_animation(model_name: int, test_set_name: tuple, test_case_idx: int, steps: int = 25):
+def make_animation(model_name: int, test_case_idx: int, steps: int = 160):
     '''
     visualize running results
     model_name: model number in 'models' file
@@ -207,7 +207,8 @@ def make_animation(model_name: int, test_set_name: tuple, test_case_idx: int, st
     state_dict = torch.load('models/{}.pth'.format(model_name), map_location=device)
     network.load_state_dict(state_dict)
 
-    test_name = 'test_set/40_length_16_agents_0.3_density.pkl'
+    # test_name = 'test_set/40_length_16_agents_0.3_density.pkl'
+    test_name = 'test_set/40length_16agents_0.3density.pth'
     with open(test_name, 'rb') as f:
         tests = pickle.load(f)
 
@@ -215,7 +216,7 @@ def make_animation(model_name: int, test_set_name: tuple, test_case_idx: int, st
     env.load(tests[test_case_idx][0], tests[test_case_idx][1], tests[test_case_idx][2])
 
     fig = plt.figure()
-            
+
     done = False
     obs, pos = env.observe()
 
@@ -268,11 +269,22 @@ def make_animation(model_name: int, test_set_name: tuple, test_case_idx: int, st
 
 
     ani = animation.ArtistAnimation(fig, imgs, interval=600, blit=True, repeat_delay=1000)
+    writer = animation.FFMpegWriter(fps=10)
 
-    ani.save('videos/{}_{}_{}_{}.mp4'.format(model_name, *test_set_name))
+    ani.save('videos/{}_{}_{}_{}.mp4'.format(model_name, 40, 16, 0.3), writer=writer)
+    # ani.save('videos/{}_{}_{}_{}.gif'.format(model_name, 40, 16, 0.3), writer='Pillow')
 
 
 if __name__ == '__main__':
 
-    create_test(test_env_settings=configs.test_env_settings, num_test_cases=configs.num_test_cases)
+    # create_test(test_env_settings=configs.test_env_settings, num_test_cases=configs.num_test_cases)
     # test_model((2000, 6000))
+    # test_model(337500)
+
+    # make_animation(model_name='2000', test_case_idx=0, steps=160)
+    # make_animation(model_name='4000', test_case_idx=0, steps=160)
+    # make_animation(model_name='8000', test_case_idx=0, steps=160)
+    # make_animation(model_name='16000', test_case_idx=0, steps=160)
+    # make_animation(model_name='337500', test_case_idx=0, steps=160)
+
+    pass
